@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz Mês do Orgulho LGBTQIAPN+</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap');
+
+  :root {
+    --red: #E40303;
+    --orange: #FF8C00;
+    --yellow: #FFED00;
+    --green: #008026;
+    --blue: #004DFF;
+    --violet: #750787;
+    --bg: #0a0a0f;
+    --surface: #13131a;
+    --surface2: #1c1c28;
+    --border: rgba(255,255,255,0.08);
+    --text: #f0eef8;
+    --text-muted: rgba(240,238,248,0.55);
+    --radius: 16px;
+    --accent: #c084fc;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  .rainbow-bar {
+    height: 5px;
+    background: linear-gradient(90deg, var(--red), var(--orange), var(--yellow), var(--green), var(--blue), var(--violet));
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+  }
+
+  .bg-orbs {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+  }
+  .orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.18;
+  }
+  .orb1 { width: 500px; height: 500px; top: -150px; left: -100px; background: var(--violet); }
+  .orb2 { width: 400px; height: 400px; top: 30%; right: -120px; background: var(--blue); }
+  .orb3 { width: 350px; height: 350px; bottom: -100px; left: 30%; background: var(--red); }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 60px 24px 80px;
+  }
+
+  .screen { display: none; animation: fadeIn .4s ease; }
+  .screen.active { display: block; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* HEADER */
+  .logo-flag {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 2rem;
+  }
+  .flag-stripe {
+    height: 6px;
+    border-radius: 3px;
+    flex: 1;
+  }
+
+  h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    margin-bottom: 0.6rem;
+  }
+
+  .gradient-text {
+    background: linear-gradient(135deg, #c084fc, #60a5fa, #34d399);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .subtitle {
+    font-size: 1.05rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+    margin-bottom: 2.5rem;
+  }
+
+  /* CARD */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 2rem;
+  }
+
+  /* FORM */
+  .field {
+    margin-bottom: 1.25rem;
+  }
+  label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 0.4rem;
+  }
+  input[type="text"] {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0.75rem 1rem;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1rem;
+    outline: none;
+    transition: border-color .2s;
+  }
+  input[type="text"]:focus {
+    border-color: var(--accent);
+  }
+  .error-msg {
+    color: #f87171;
+    font-size: 0.82rem;
+    margin-top: 0.3rem;
+    display: none;
+  }
+
+  /* BUTTONS */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    padding: 0.85rem 2rem;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    transition: transform .15s, box-shadow .15s;
+    text-decoration: none;
+  }
+  .btn:active { transform: scale(0.97); }
+  .btn-primary {
+    background: linear-gradient(135deg, #a855f7, #6366f1);
+    color: #fff;
+    box-shadow: 0 4px 24px rgba(168,85,247,0.3);
+    width: 100%;
+  }
+  .btn-primary:hover { box-shadow: 0 4px 32px rgba(168,85,247,0.5); }
+  .btn-outline {
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--border);
+  }
+  .btn-outline:hover { background: var(--surface2); }
+
+  /* PROGRESS */
+  .progress-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+  .q-counter {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    letter-spacing: 0.06em;
+  }
+  .progress-bar-wrap {
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    margin-bottom: 1.75rem;
+    overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #a855f7, #6366f1);
+    border-radius: 2px;
+    transition: width .4s ease;
+  }
+
+  /* QUESTION */
+  .question-text {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.25rem;
+    font-weight: 700;
+    line-height: 1.4;
+    margin-bottom: 1.5rem;
+  }
+
+  .options-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+  }
+
+  .option-btn {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 0.9rem 1.1rem;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.97rem;
+    text-align: left;
+    cursor: pointer;
+    transition: background .15s, border-color .15s, transform .1s;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .option-btn:hover:not(:disabled) {
+    background: rgba(168,85,247,0.1);
+    border-color: rgba(168,85,247,0.4);
+    transform: translateX(4px);
+  }
+  .option-btn:disabled { cursor: default; transform: none !important; }
+  .option-letter {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    background: var(--surface);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Syne', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 700;
+    flex-shrink: 0;
+    transition: background .15s;
+  }
+  .option-btn.correct {
+    background: rgba(52,211,153,0.12);
+    border-color: rgba(52,211,153,0.5);
+  }
+  .option-btn.correct .option-letter {
+    background: rgba(52,211,153,0.3);
+    color: #34d399;
+  }
+  .option-btn.wrong {
+    background: rgba(248,113,113,0.1);
+    border-color: rgba(248,113,113,0.4);
+  }
+  .option-btn.wrong .option-letter {
+    background: rgba(248,113,113,0.25);
+    color: #f87171;
+  }
+
+  /* HISTORY BOX */
+  .history-box {
+    margin-top: 1.25rem;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1rem 1.25rem;
+    font-size: 0.9rem;
+    line-height: 1.65;
+    color: var(--text-muted);
+    display: none;
+  }
+  .history-box.show { display: block; animation: fadeIn .35s ease; }
+  .history-box strong { color: var(--accent); }
+
+  .next-btn-wrap { margin-top: 1.25rem; text-align: right; }
+
+  /* RESULT */
+  .score-circle {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #a855f7, #6366f1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+  }
+  .score-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 2.8rem;
+    font-weight: 800;
+    line-height: 1;
+  }
+  .score-label { font-size: 0.78rem; opacity: 0.8; }
+  .result-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.6rem;
+    font-weight: 800;
+    text-align: center;
+    margin-bottom: 0.5rem;
+  }
+  .result-msg {
+    text-align: center;
+    color: var(--text-muted);
+    margin-bottom: 2rem;
+    line-height: 1.6;
+  }
+
+  /* ADMIN */
+  .admin-link {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 8px 16px;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    cursor: pointer;
+    z-index: 50;
+    font-family: 'DM Sans', sans-serif;
+    transition: border-color .2s;
+  }
+  .admin-link:hover { border-color: var(--accent); color: var(--accent); }
+
+  .admin-table-wrap { overflow-x: auto; margin-top: 1rem; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+  }
+  th {
+    text-align: left;
+    padding: 0.6rem 0.8rem;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-muted);
+    font-weight: 500;
+    font-size: 0.78rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  td {
+    padding: 0.7rem 0.8rem;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+  }
+  tr:last-child td { border-bottom: none; }
+
+  .tag {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+  .tag-ok { background: rgba(52,211,153,0.12); color: #34d399; }
+  .tag-low { background: rgba(248,113,113,0.12); color: #f87171; }
+  .tag-mid { background: rgba(251,191,36,0.12); color: #fbbf24; }
+
+  .export-btn {
+    margin-top: 1rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0.5rem 1rem;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.88rem;
+    cursor: pointer;
+    transition: border-color .2s;
+  }
+  .export-btn:hover { border-color: var(--accent); }
+
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 1.5rem 0;
+  }
+
+  /* QR PAGE */
+  #qr-canvas { display: flex; justify-content: center; margin: 1.5rem 0; }
+  #qr-canvas canvas, #qr-canvas img { border-radius: 12px; }
+
+  .blocked-msg {
+    text-align: center;
+    padding: 3rem 1rem;
+  }
+  .blocked-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+  }
+
+  @media (max-width: 480px) {
+    .container { padding: 50px 16px 60px; }
+    .card { padding: 1.25rem; }
+    h1 { font-size: 1.8rem; }
+    .question-text { font-size: 1.1rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="rainbow-bar"></div>
+
+<div class="bg-orbs">
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+  <div class="orb orb3"></div>
+</div>
+
+<div class="container">
+
+  <!-- SCREEN: HOME / QR -->
+  <div class="screen active" id="screen-home">
+    <div class="logo-flag">
+      <div class="flag-stripe" style="background:var(--red)"></div>
+      <div class="flag-stripe" style="background:var(--orange)"></div>
+      <div class="flag-stripe" style="background:var(--yellow)"></div>
+      <div class="flag-stripe" style="background:var(--green)"></div>
+      <div class="flag-stripe" style="background:var(--blue)"></div>
+      <div class="flag-stripe" style="background:var(--violet)"></div>
+    </div>
+    <h1><span class="gradient-text">Mês do Orgulho</span><br>LGBTQIAPN+ no Brasil</h1>
+    <p class="subtitle">Teste seus conhecimentos sobre história, diversidade e inclusão LGBTQIAPN+. 10 perguntas, cada participante responde uma vez.</p>
+    <div class="card" id="qr-card">
+      <p style="font-size:0.8rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-muted);margin-bottom:1rem">Escaneie para participar</p>
+      <div id="qr-canvas"></div>
+      <p style="text-align:center;font-size:0.82rem;color:var(--text-muted);margin-top:0.5rem" id="qr-url-label"></p>
+      <div class="divider"></div>
+      <button class="btn btn-primary" onclick="showScreen('screen-register')">Responder agora →</button>
+    </div>
+  </div>
+
+  <!-- SCREEN: REGISTER -->
+  <div class="screen" id="screen-register">
+    <div class="logo-flag">
+      <div class="flag-stripe" style="background:var(--red)"></div>
+      <div class="flag-stripe" style="background:var(--orange)"></div>
+      <div class="flag-stripe" style="background:var(--yellow)"></div>
+      <div class="flag-stripe" style="background:var(--green)"></div>
+      <div class="flag-stripe" style="background:var(--blue)"></div>
+      <div class="flag-stripe" style="background:var(--violet)"></div>
+    </div>
+    <h1 style="font-size:1.8rem;margin-bottom:0.4rem">Identificação</h1>
+    <p class="subtitle" style="margin-bottom:1.5rem">Informe seus dados para participar. Cada CPF só pode responder uma vez.</p>
+    <div class="card">
+      <div class="field">
+        <label>Nome completo</label>
+        <input type="text" id="inp-nome" placeholder="Seu nome" />
+        <p class="error-msg" id="err-nome">Por favor, informe seu nome.</p>
+      </div>
+      <div class="field">
+        <label>CPF</label>
+        <input type="text" id="inp-cpf" placeholder="000.000.000-00" maxlength="14" />
+        <p class="error-msg" id="err-cpf">CPF inválido ou já participou.</p>
+      </div>
+      <button class="btn btn-primary" onclick="handleRegister()">Começar o Quiz →</button>
+    </div>
+  </div>
+
+  <!-- SCREEN: BLOCKED -->
+  <div class="screen" id="screen-blocked">
+    <div class="card">
+      <div class="blocked-msg">
+        <div class="blocked-icon">🚫</div>
+        <h2 style="font-family:'Syne',sans-serif;margin-bottom:0.5rem">Já participou!</h2>
+        <p style="color:var(--text-muted);line-height:1.6">Este CPF já respondeu o quiz. Cada pessoa só pode participar uma vez. Obrigado por sua participação!</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN: QUIZ -->
+  <div class="screen" id="screen-quiz">
+    <div class="progress-header">
+      <span class="q-counter" id="q-counter">Pergunta 1 / 10</span>
+      <span class="q-counter" id="q-score-live">Pontos: 0</span>
+    </div>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-fill" id="progress-fill" style="width:10%"></div>
+    </div>
+    <div class="card">
+      <p class="question-text" id="question-text"></p>
+      <div class="options-grid" id="options-grid"></div>
+      <div class="history-box" id="history-box"></div>
+      <div class="next-btn-wrap" id="next-wrap" style="display:none">
+        <button class="btn btn-primary" style="width:auto;padding:.75rem 1.5rem" onclick="nextQuestion()">
+          <span id="next-label">Próxima →</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN: RESULT -->
+  <div class="screen" id="screen-result">
+    <div class="logo-flag">
+      <div class="flag-stripe" style="background:var(--red)"></div>
+      <div class="flag-stripe" style="background:var(--orange)"></div>
+      <div class="flag-stripe" style="background:var(--yellow)"></div>
+      <div class="flag-stripe" style="background:var(--green)"></div>
+      <div class="flag-stripe" style="background:var(--blue)"></div>
+      <div class="flag-stripe" style="background:var(--violet)"></div>
+    </div>
+    <div class="card">
+      <div class="score-circle">
+        <div class="score-num" id="final-score">0</div>
+        <div class="score-label">de 10 pts</div>
+      </div>
+      <div class="result-title" id="result-title">Parabéns!</div>
+      <p class="result-msg" id="result-msg"></p>
+      <div style="text-align:center">
+        <button class="btn btn-outline" onclick="showScreen('screen-home')" style="display:inline-flex;padding:.75rem 1.5rem">Ver QR Code</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN: ADMIN -->
+  <div class="screen" id="screen-admin">
+    <h1 style="font-size:1.6rem;margin-bottom:0.3rem">Painel <span class="gradient-text">Administrador</span></h1>
+    <p class="subtitle" style="margin-bottom:1.5rem">Lista de todos os participantes do quiz.</p>
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+        <span style="font-size:0.88rem;color:var(--text-muted)" id="admin-count">0 participantes</span>
+        <button class="export-btn" onclick="exportCSV()">⬇ Exportar CSV</button>
+      </div>
+      <div class="divider"></div>
+      <div class="admin-table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Nome</th>
+              <th>CPF</th>
+              <th>Pontuação</th>
+              <th>Acertos</th>
+              <th>Data/Hora</th>
+            </tr>
+          </thead>
+          <tbody id="admin-tbody"></tbody>
+        </table>
+      </div>
+      <div style="margin-top:1.5rem">
+        <button class="btn btn-outline" onclick="showScreen('screen-home')" style="display:inline-flex;padding:.65rem 1.25rem;font-size:.9rem">← Voltar</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<button class="admin-link" onclick="showAdmin()">Admin 🔑</button>
+
+<script>
+const QUESTIONS = [
+  {
+    text: "O que a bandeira arco-íris representa?",
+    options: ["Apenas festas", "Um time", "Diversidade e orgulho LGBTQIAPN+", "Um país"],
+    correct: 2,
+    history: "<strong>A bandeira arco-íris</strong> foi criada pelo artista e ativista Gilbert Baker em 1978, a pedido do político Harvey Milk, o primeiro homem abertamente gay eleito nos Estados Unidos. As cores originais tinham significados específicos: rosa (sexualidade), vermelho (vida), laranja (cura), amarelo (luz do sol), verde (natureza), azul turquesa (arte), anil (harmonia) e violeta (espírito). Com o tempo, a versão com seis listras se tornou o símbolo universal da diversidade e do orgulho LGBTQIAPN+, sendo hasteada em paradas e eventos ao redor do mundo."
+  },
+  {
+    text: "O respeito aos pronomes de uma pessoa é importante porque:",
+    options: ["Demonstra educação e respeito à identidade dela", "É obrigatório por lei em todos os lugares", "Não faz diferença", "Serve apenas na internet"],
+    correct: 0,
+    history: "<strong>O uso correto dos pronomes</strong> é uma forma fundamental de respeitar a identidade de gênero de uma pessoa. Para pessoas transgênero e não-binárias, ser chamado pelos pronomes corretos — ele/dele, ela/dela ou elu/delu — é essencial para sua saúde mental e bem-estar. Estudos mostram que o respeito aos pronomes reduz significativamente os índices de depressão e ansiedade em pessoas trans. No Brasil, o CFESS (Conselho Federal de Serviço Social) já orienta o uso do nome social e pronomes adequados. É um gesto simples que demonstra respeito e humanidade."
+  },
+  {
+    text: "Qual mês é conhecido mundialmente como o mês do orgulho LGBTQIAPN+?",
+    options: ["Janeiro", "Julho", "Agosto", "Junho"],
+    correct: 3,
+    history: "<strong>Junho é o Mês do Orgulho LGBTQIAPN+</strong> em homenagem à Rebelião de Stonewall, ocorrida em 28 de junho de 1969 em Nova York. Na madrugada desse dia, frequentadores do bar Stonewall Inn — um point LGBTQIAPN+ — resistiram a uma violenta batida policial. A revolta durou três dias e é considerada o marco do início do moderno movimento pelos direitos LGBTQIAPN+. No Brasil, a primeira Parada do Orgulho de São Paulo aconteceu em 1997, e atualmente a Parada LGBTQIAPN+ de São Paulo é a maior do mundo, reunindo milhões de pessoas."
+  },
+  {
+    text: "A sigla LGBTQIAPN+ representa:",
+    options: ["Apenas orientação sexual", "Apenas identidade de gênero", "Diversidade de orientações, identidades e expressões", "Um movimento político apenas"],
+    correct: 2,
+    history: "<strong>A sigla LGBTQIAPN+</strong> é uma representação inclusiva da diversidade humana. L = Lésbicas, G = Gays, B = Bissexuais, T = Transexuais/Transgêneros, Q = Queer (pessoas que não se identificam com normas de gênero ou sexualidade), I = Intersexo (pessoas que nascem com características biológicas que não se encaixam nos padrões típicos de macho ou fêmea), A = Assexuais/Arromânticas, P = Pansexuais (atração por pessoas independente de gênero), N = Não-binárias (pessoas que não se identificam exclusivamente como homem ou mulher), e o + representa todas as demais identidades. A sigla está em constante evolução, refletindo o crescente reconhecimento da diversidade das experiências humanas de gênero e sexualidade."
+  },
+  {
+    text: "O que significa a letra 'L' na sigla LGBTQIAPN+?",
+    options: ["Lésbica", "Livre", "Linguagem", "Latina"],
+    correct: 0,
+    history: "<strong>Lésbica</strong> é o termo usado para descrever mulheres que se sentem atraídas romanticamente e/ou sexualmente por outras mulheres. A palavra tem origem na ilha grega de Lesbos, onde viveu a poetisa Safo (séc. VII a.C.), conhecida por seus poemas de amor dedicados a outras mulheres. No Brasil, o movimento de lésbicas tem uma longa trajetória de luta por visibilidade e direitos. O Dia da Visibilidade Lésbica é comemorado em 29 de agosto, data escolhida em referência ao primeiro Seminário Nacional de Lésbicas (SENALE), realizado em 1996."
+  },
+  {
+    text: "Qual foi a primeira cidade do Brasil a realizar uma Parada do Orgulho LGBTQIAPN+?",
+    options: ["Rio de Janeiro", "Curitiba", "São Paulo", "Salvador"],
+    correct: 2,
+    history: "<strong>São Paulo</strong> realizou a primeira Parada do Orgulho LGBTQIAPN+ do Brasil em 28 de junho de 1997, na Avenida Paulista. O evento contou com apenas 2.000 participantes em sua primeira edição. Com o passar dos anos, cresceu exponencialmente: em 2006, foi reconhecida como a maior do mundo pelo Guinness World Records, reunindo mais de 2,5 milhões de pessoas. Em anos recentes, a Parada de São Paulo chega a reunir entre 3 e 5 milhões de pessoas, tornando-se não apenas a maior parada LGBTQIAPN+, mas um dos maiores eventos ao ar livre do planeta."
+  },
+  {
+    text: "A decisão do STF (Supremo Tribunal Federal) de 2019 criminalizou:",
+    options: ["O casamento homoafetivo", "A homofobia e a transfobia", "Adoção por casais LGBTQIAPN+", "Uso do nome social"],
+    correct: 1,
+    history: "<strong>Em junho de 2019</strong>, o STF decidiu, por 8 votos a 3, enquadrar a homofobia e a transfobia como crimes de racismo, equiparando-os à Lei do Racismo (Lei 7.716/1989). A decisão histórica preenchia uma lacuna legislativa, já que o Brasil não tinha lei específica criminalizando a discriminação por orientação sexual e identidade de gênero. Antes dessa decisão, o Brasil era um dos países com maior número de assassinatos de pessoas LGBTQIAPN+. A criminalização é considerada um marco, embora ativistas ressaltem que ainda é necessário aprovar uma lei específica pelo Congresso Nacional."
+  },
+  {
+    text: "O que é a Parada do Orgulho LGBTQIAPN+ de São Paulo no contexto mundial?",
+    options: ["Menor parada do mundo", "Uma das maiores do mundo", "Exclusiva para brasileiros", "Evento apenas cultural, sem caráter político"],
+    correct: 1,
+    history: "<strong>A Parada do Orgulho LGBTQIAPN+ de São Paulo</strong> é reconhecida como uma das maiores do mundo e já foi considerada pelo Guinness World Records como a maior parada LGBTQIAPN+ do planeta em múltiplas edições. O evento, realizado anualmente na Avenida Paulista, em junho, cresceu de 2.000 participantes em 1997 para milhões nas edições recentes. A parada tem caráter político e cultural, reivindicando direitos e celebrando conquistas da comunidade LGBTQIAPN+. Cada edição tem um tema, e o evento conta com shows, trios elétricos e a presença de pessoas de todo o Brasil e do mundo."
+  },
+  {
+    text: "Qual é o significado da letra 'T' na sigla LGBTQIAPN+?",
+    options: ["Travestido", "Transgênero/Transexual", "Típico", "Tecnológico"],
+    correct: 1,
+    history: "<strong>O T representa pessoas Transgênero e Transexuais</strong>: indivíduos cuja identidade de gênero não corresponde ao sexo que lhes foi atribuído ao nascimento. A diferença entre os termos: pessoas transexuais geralmente buscam adequação corporal (cirurgia, hormônios), enquanto transgênero é um termo mais amplo. No Brasil, o Decreto nº 8.727/2016 garante o uso do nome social de pessoas travestis e transexuais nos registros dos órgãos públicos. Em 2018, o STF permitiu a alteração do nome e gênero no registro civil sem necessidade de cirurgia ou laudos médicos."
+  },
+  {
+    text: "O Brasil reconhece legalmente a união entre pessoas do mesmo sexo desde:",
+    options: ["1988", "2011", "2005", "2019"],
+    correct: 1,
+    history: "<strong>Em maio de 2011</strong>, o Supremo Tribunal Federal reconheceu por unanimidade (10 votos a 0) a união estável entre pessoas do mesmo sexo como entidade familiar, com todos os direitos civis correspondentes. Em 2013, o Conselho Nacional de Justiça (CNJ) determinou que cartórios de todo o Brasil realizassem o casamento civil homoafetivo. O Brasil foi o 15º país do mundo a reconhecer o casamento entre pessoas do mesmo sexo. As conquistas incluem direitos como herança, planos de saúde, adoção e benefícios previdenciários, representando avanços significativos na luta pela igualdade LGBTQIAPN+."
+  }
+];
+
+let currentQ = 0;
+let score = 0;
+let answered = false;
+let currentUser = null;
+
+function getParticipants() {
+  try { return JSON.parse(localStorage.getItem('lgbtq_participants') || '[]'); }
+  catch { return []; }
+}
+
+function saveParticipant(data) {
+  const all = getParticipants();
+  all.push(data);
+  localStorage.setItem('lgbtq_participants', JSON.stringify(all));
+}
+
+function cpfAlreadyUsed(cpf) {
+  return getParticipants().some(p => p.cpf === cpf);
+}
+
+function formatCPF(v) {
+  v = v.replace(/\D/g,'').slice(0,11);
+  if (v.length > 9) v = v.slice(0,3)+'.'+v.slice(3,6)+'.'+v.slice(6,9)+'-'+v.slice(9);
+  else if (v.length > 6) v = v.slice(0,3)+'.'+v.slice(3,6)+'.'+v.slice(6);
+  else if (v.length > 3) v = v.slice(0,3)+'.'+v.slice(3);
+  return v;
+}
+
+function validateCPF(c) {
+  c = c.replace(/\D/g,'');
+  if (c.length !== 11 || /^(\d)\1+$/.test(c)) return false;
+  let s = 0;
+  for (let i=0;i<9;i++) s += +c[i]*(10-i);
+  let r = (s*10)%11; if (r===10||r===11) r=0; if (r !== +c[9]) return false;
+  s = 0;
+  for (let i=0;i<10;i++) s += +c[i]*(11-i);
+  r = (s*10)%11; if (r===10||r===11) r=0;
+  return r === +c[10];
+}
+
+document.getElementById('inp-cpf').addEventListener('input', function() {
+  this.value = formatCPF(this.value);
+});
+
+function handleRegister() {
+  const nome = document.getElementById('inp-nome').value.trim();
+  const cpf = document.getElementById('inp-cpf').value.trim();
+  let ok = true;
+
+  document.getElementById('err-nome').style.display = 'none';
+  document.getElementById('err-cpf').style.display = 'none';
+
+  if (!nome) { document.getElementById('err-nome').style.display = 'block'; ok = false; }
+  if (!validateCPF(cpf)) { document.getElementById('err-cpf').textContent = 'CPF inválido.'; document.getElementById('err-cpf').style.display = 'block'; ok = false; }
+  else if (cpfAlreadyUsed(cpf.replace(/\D/g,''))) {
+    document.getElementById('err-cpf').textContent = 'Este CPF já participou do quiz.';
+    document.getElementById('err-cpf').style.display = 'block';
+    ok = false;
+  }
+  if (!ok) return;
+
+  currentUser = { nome, cpf: cpf.replace(/\D/g,''), cpfFmt: cpf };
+  currentQ = 0; score = 0;
+  startQuiz();
+}
+
+function startQuiz() {
+  showScreen('screen-quiz');
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = QUESTIONS[currentQ];
+  answered = false;
+  document.getElementById('q-counter').textContent = `Pergunta ${currentQ+1} / 10`;
+  document.getElementById('q-score-live').textContent = `Pontos: ${score}`;
+  document.getElementById('progress-fill').style.width = `${((currentQ+1)/10)*100}%`;
+  document.getElementById('question-text').textContent = q.text;
+  document.getElementById('history-box').classList.remove('show');
+  document.getElementById('history-box').innerHTML = '';
+  document.getElementById('next-wrap').style.display = 'none';
+
+  const labels = ['A','B','C','D'];
+  const grid = document.getElementById('options-grid');
+  grid.innerHTML = '';
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.innerHTML = `<span class="option-letter">${labels[i]}</span>${opt}`;
+    btn.onclick = () => selectAnswer(i);
+    grid.appendChild(btn);
+  });
+
+  const nl = document.getElementById('next-label');
+  nl.textContent = currentQ < 9 ? 'Próxima →' : 'Ver resultado →';
+}
+
+function selectAnswer(idx) {
+  if (answered) return;
+  answered = true;
+  const q = QUESTIONS[currentQ];
+  const btns = document.querySelectorAll('.option-btn');
+  btns.forEach(b => b.disabled = true);
+  btns[idx].classList.add(idx === q.correct ? 'correct' : 'wrong');
+  if (idx !== q.correct) btns[q.correct].classList.add('correct');
+  if (idx === q.correct) score++;
+
+  const hbox = document.getElementById('history-box');
+  hbox.innerHTML = (idx === q.correct
+    ? `<span style="color:#34d399;font-weight:600">✓ Resposta correta!</span><br><br>`
+    : `<span style="color:#f87171;font-weight:600">✗ Resposta incorreta.</span><br><br>`) + q.history;
+  hbox.classList.add('show');
+  document.getElementById('next-wrap').style.display = 'block';
+}
+
+function nextQuestion() {
+  currentQ++;
+  if (currentQ < 10) {
+    renderQuestion();
+  } else {
+    finishQuiz();
+  }
+}
+
+function finishQuiz() {
+  const now = new Date();
+  const dt = now.toLocaleDateString('pt-BR') + ' ' + now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+  saveParticipant({ nome: currentUser.nome, cpf: currentUser.cpf, cpfFmt: currentUser.cpfFmt, score, datetime: dt });
+
+  document.getElementById('final-score').textContent = score;
+  const msgs = [
+    [0,3, 'Continue aprendendo!', 'Que tal explorar mais sobre a história e cultura LGBTQIAPN+? Cada aprendizado nos torna mais inclusivos.'],
+    [4,6, 'Bom começo!', 'Você já tem um bom conhecimento sobre a comunidade LGBTQIAPN+. Continue se informando e espalhando respeito!'],
+    [7,9, 'Muito bem!', 'Você demonstra excelente conhecimento sobre a comunidade LGBTQIAPN+. Continue sendo um aliado do respeito e da diversidade!'],
+    [10,10, 'Incrível! Nota 10! 🌈', 'Parabéns! Você tem um conhecimento excepcional sobre a história e cultura LGBTQIAPN+. Continue espalhando amor e respeito!']
+  ];
+  const m = msgs.find(([a,b]) => score >= a && score <= b);
+  document.getElementById('result-title').textContent = m[2];
+  document.getElementById('result-msg').textContent = m[3];
+  showScreen('screen-result');
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function showAdmin() {
+  const pw = prompt('Senha de administrador:');
+  if (pw !== 'admin2024') { alert('Senha incorreta.'); return; }
+  renderAdmin();
+  showScreen('screen-admin');
+}
+
+function renderAdmin() {
+  const all = getParticipants();
+  document.getElementById('admin-count').textContent = `${all.length} participante${all.length !== 1 ? 's' : ''}`;
+  const tbody = document.getElementById('admin-tbody');
+  if (all.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:2rem">Nenhum participante ainda.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = all.map((p,i) => {
+    const pct = (p.score/10)*100;
+    const tagClass = pct >= 70 ? 'tag-ok' : pct >= 40 ? 'tag-mid' : 'tag-low';
+    return `<tr>
+      <td style="color:var(--text-muted)">${i+1}</td>
+      <td>${p.nome}</td>
+      <td style="font-family:monospace;font-size:0.85rem">${p.cpfFmt || p.cpf}</td>
+      <td><span class="tag ${tagClass}">${p.score}/10</span></td>
+      <td>${p.score} acertos</td>
+      <td style="color:var(--text-muted);font-size:0.82rem">${p.datetime}</td>
+    </tr>`;
+  }).join('');
+}
+
+function exportCSV() {
+  const all = getParticipants();
+  if (!all.length) { alert('Nenhum dado para exportar.'); return; }
+  const header = 'Nome,CPF,Pontuação,Acertos,Data/Hora\n';
+  const rows = all.map(p => `"${p.nome}","${p.cpfFmt||p.cpf}",${p.score}/10,${p.score},"${p.datetime}"`).join('\n');
+  const blob = new Blob(['\uFEFF'+header+rows], {type:'text/csv;charset=utf-8;'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'participantes_quiz_lgbt.csv';
+  a.click();
+}
+
+window.addEventListener('load', () => {
+  const url = window.location.href.split('?')[0];
+  document.getElementById('qr-url-label').textContent = url;
+  try {
+    new QRCode(document.getElementById('qr-canvas'), {
+      text: url,
+      width: 200,
+      height: 200,
+      colorDark: '#ffffff',
+      colorLight: '#13131a',
+      correctLevel: QRCode.CorrectLevel.H
+    });
+  } catch(e) {
+    document.getElementById('qr-canvas').innerHTML = '<p style="color:var(--text-muted);font-size:0.85rem">QR Code disponível ao hospedar online.</p>';
+  }
+});
+</script>
+</body>
+</html>
